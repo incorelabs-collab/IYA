@@ -1,0 +1,171 @@
+<header>
+    <div class="page-header navbar-default navbar-fixed-top" align="center">
+        <button class="navbar-toggle btn-lg backBtn" type="button" id="bckWithSearch" onclick="app.onBackKeyDown();">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+        </button>
+        <h2 class="headerText">Wish Them</h2>
+        <button id="search_icon" class="navbar-toggle" type="button" onclick="searchMiniApp.openSearchForm();">
+          <span class="glyphicon glyphicon-search"></span>
+        </button>
+    </div>
+</header>
+<br/>
+<br/>
+<div class="container homeContent" align="center">
+    <div class='panel-group' id='wishes'>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                <h4 class='panel-title'>
+                    <a data-toggle='collapse' data-parent='#wishes' href='#subWishToday' class='eventBdayFont'>
+                        Today
+                    </a>
+                </h4>
+            </div>
+            <div id='subWishToday' class='panel-collapse collapse in'>
+                <div class='panel-body'>
+                    <div class='panel-group' id='todayWish'>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#todayWish' href='#todayBday' class='eventBdayFont'>
+                                        Birthday
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='todayBday' class='panel-collapse collapse in'>
+                            </div>
+                        </div>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#todayWish' href='#todayAsary' class='eventBdayFont'>
+                                        Anniversary
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='todayAsary' class='panel-collapse collapse'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                <h4 class='panel-title'>
+                    <a data-toggle='collapse' data-parent='#wishes' href='#subWishTmr' class='eventBdayFont'>
+                        Tomorrow
+                    </a>
+                </h4>
+            </div>
+            <div id='subWishTmr' class='panel-collapse collapse'>
+                <div class='panel-body'>
+                    <div class='panel-group' id='tmrWish'>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#tmrWish' href='#tmrBday' class='eventBdayFont'>
+                                        Birthday
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='tmrBday' class='panel-collapse collapse in'>
+                            </div>
+                        </div>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#tmrWish' href='#tmrAsary' class='eventBdayFont'>
+                                        Anniversary
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='tmrAsary' class='panel-collapse collapse'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                <h4 class='panel-title'>
+                    <a data-toggle='collapse' data-parent='#wishes' href='#subWishDayAfter' class='eventBdayFont'>
+                        Day After
+                    </a>
+                </h4>
+            </div>
+            <div id='subWishDayAfter' class='panel-collapse collapse'>
+                <div class='panel-body'>
+                    <div class='panel-group' id='dayAfterWish'>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#dayAfterWish' href='#dayAfterBday' class='eventBdayFont'>
+                                        Birthday
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='dayAfterBday' class='panel-collapse collapse in'>
+                            </div>
+                        </div>
+                        <div class='panel panel-info'>
+                            <div class='panel-heading'>
+                                <h4 class='panel-title'>
+                                    <a data-toggle='collapse' data-parent='#dayAfterWish' href='#dayAfterAsary' class='eventBdayFont'>
+                                        Anniversary
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id='dayAfterAsary' class='panel-collapse collapse'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Search Modal -->
+<div class="modal" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="searchMiniApp.closeSearchModal();" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="searchLabel" align="center">Search</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form" id="searchForm" name="searchNameForm">
+                    <div class="form-group">
+                        <label for="memberName">Name</label>
+                        <input type="text" class="form-control" id="memberName" placeholder="Name" name="memberName">
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group</label>
+                        <select class="form-control" id="bloodGroup" name="bloodGroup">
+                            <option value="">Select Blood Group</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberOccupation">Occupation</label>
+                        <input type="text" class="form-control" id="memberOccupation" placeholder="Occupation" name="memberOccupation">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="search_close_btn" onclick="searchMiniApp.closeSearchModal();">Close</button>
+                <button type="button" class="btn btn-primary" id="search_btn" onclick="searchMiniApp.validateSearchForm();">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/BnA.js"></script>
+<script src="js/search.js"></script>
