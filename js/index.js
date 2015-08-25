@@ -24,6 +24,24 @@ var app = {
         app.db = app.getAppDb();
         app.imgDb = app.getImgDb();
         navigator.splashscreen.show();
+        if(localStorage.getItem("secondAdImg") != null) {
+            var imgDir = localStorage.getItem("imgDir");
+            $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("secondAdImg")).url+"' id='second_splash' />");
+            setTimeout(function () {
+                navigator.splashscreen.hide();
+                if(localStorage.getItem("thirdAdImg") != null) {
+                    $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("thirdAdImg")).url+"' id='third_splash' />");
+                    setTimeout(function () {
+                        $('#second_splash').remove();
+                    }, 1500);
+                    setTimeout(function () {
+                        $('#third_splash').remove();
+                    }, 3500);
+                } else {
+                    $('#second_splash').remove();
+                }
+            }, 5500);
+        }
         document.addEventListener('backbutton', app.onBackKeyDown, false);
         localStorage.removeItem("openModal");
         localStorage.removeItem('backLog');
@@ -43,6 +61,9 @@ var app = {
             });
         }
         localStorage.setItem("hitImageServer",false);
+        localStorage.setItem("hitFooterAdServer",false);
+        localStorage.setItem("hitSecondAdServer",false);
+        localStorage.setItem("hitThirdAdServer",false);
         app.checkConnection();
     },
     checkConnection: function () {
@@ -85,7 +106,7 @@ var app = {
 
             localStorage.setItem('dbCurrentOnline',json[0][0]);
 
-            app.requestStatus = [false, false, false, false, false, false, false, false, false, false, false, false, false];
+            app.requestStatus = [false, false, false, false, false, false, false, false, false, false];
 
             $.getJSON('http://iya.incorelabs.com/users.php', function(userData) {
                 app.createTable(userData,"users",0);
@@ -108,28 +129,22 @@ var app = {
             $.getJSON('http://iya.incorelabs.com/events.php', function(eventsData) {
                 app.createTable(eventsData,"events",6);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/founders.php', function(pastFoundersData) {
-                app.createTable(pastFoundersData,"founders",7);
-            });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_presidents.php', function(pastPresidentsData) {
-                app.createTable(pastPresidentsData,"past_presidents",8);
-            });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_vice_presidents.php', function(pastVicePresidentsData) {
-                app.createTable(pastVicePresidentsData,"past_vice_presidents",9);
+                app.createTable(pastPresidentsData,"past_presidents",7);
             });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_secretaries.php', function(pastSecretariesData) {
-                app.createTable(pastSecretariesData,"past_secretaries",10);
-            });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_ass_secretaries.php', function(pastAssSecretariesData) {
-                app.createTable(pastAssSecretariesData,"past_ass_secretaries",11);
+                app.createTable(pastSecretariesData,"past_secretaries",8);
             });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_treasurers.php', function(pastTreasurersData) {
-                app.createTable(pastTreasurersData,"past_treasurers",12);
+                app.createTable(pastTreasurersData,"past_treasurers",9);
             });
             
         } else {
             // Internet BUT Data is Up to Date.
             app.getImageAssets();
+            app.getFooterAd();
+            app.getSecondAd();
+            app.getThirdAd();
             if(app.getBoolean(localStorage.getItem("isUserLoggedIn")) != true) {
                 app.displayPage("login.html");
             } else {
@@ -181,12 +196,83 @@ var app = {
             }
         });
     },
+    getFooterAd: function() {
+        var urlImages = 'http://iya.incorelabs.com/ads/file-list.php?key=kamlesh';
+        var dirReference = app.getDirectoryReference();
+        dirReference.done(function(imgDir) {
+            app.imgDir = imgDir;
+            if(app.getBoolean(localStorage.getItem("hitFooterAdServer")) != true){
+                // Once per app server hit.
+                $.getJSON(urlImages).done(function(res) {
+                    if(localStorage.getItem("footerAdImg") == null) {
+                        app.fetchFooterAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
+                    } else {
+                        if(JSON.parse(localStorage.getItem("footerAdImg")).timestamp != res[0].timestamp) {
+                            app.fetchFooterAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
+                        } else {
+                            var footerAdImg = {url:res[0].url.split("/").pop(), timestamp:res[0].timestamp.toString(), call:res[0].call, link:res[0].link};
+                            localStorage.setItem("footerAdImg",JSON.stringify(footerAdImg));
+                        }
+                    }
+                    localStorage.setItem("hitFooterAdServer",true);
+                });
+            }
+        });
+    },
+    getSecondAd: function() {
+        var urlImages = 'http://iya.incorelabs.com/adTwo/file-list.php?key=kamlesh';
+        var dirReference = app.getDirectoryReference();
+        dirReference.done(function(imgDir) {
+            app.imgDir = imgDir;
+            if(app.getBoolean(localStorage.getItem("hitSecondAdServer")) != true){
+                // Once per app server hit.
+                $.getJSON(urlImages).done(function(res) {
+                    if(localStorage.getItem("secondAdImg") == null) {
+                        app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                    } else {
+                        if(JSON.parse(localStorage.getItem("secondAdImg")).timestamp != res[0].timestamp) {
+                            app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                        }
+                    }
+                    localStorage.setItem("hitSecondAdServer",true);
+                });
+            }
+        });
+    },
+    getThirdAd: function() {
+        var urlImages = 'http://iya.incorelabs.com/adThree/file-list.php?key=kamlesh';
+        var dirReference = app.getDirectoryReference();
+        dirReference.done(function(imgDir) {
+            app.imgDir = imgDir;
+            if(app.getBoolean(localStorage.getItem("hitThirdAdServer")) != true){
+                // Once per app server hit.
+                $.getJSON(urlImages).done(function(res) {
+                    if(localStorage.getItem("thirdAdImg") == null) {
+                        app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                    } else {
+                        if(JSON.parse(localStorage.getItem("thirdAdImg")).timestamp != res[0].timestamp) {
+                            app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                        }
+                    }
+                    localStorage.setItem("hitThirdAdServer",true);
+                });
+            }
+        });
+    },
     doOfflineTasks: function() {
         if(localStorage.getItem('dbLocalVersion') == -1) {
             // NO Internet NO Data.
-            setTimeout(function () {
+            if($('#second_splash').length) {
+                setTimeout(function () {
+                    navigator.notification.confirm("You don't have a working internet connection.", app.onOfflineConfirm, 'Offline', ['Try Again','Exit']);
+                }, 5500);
+            } else if($('#third_splash').length) {
+                setTimeout(function () {
+                    navigator.notification.confirm("You don't have a working internet connection.", app.onOfflineConfirm, 'Offline', ['Try Again','Exit']);
+                }, 8500);
+            } else {
                 navigator.notification.confirm("You don't have a working internet connection.", app.onOfflineConfirm, 'Offline', ['Try Again','Exit']);
-            }, 2250);
+            }
         } else {
             // No Internet BUT Data is there.
             if(app.getBoolean(localStorage.getItem("isUserLoggedIn")) != true) {
@@ -216,6 +302,9 @@ var app = {
             app.requestStatus[index] = true;
             if(app.requestStatus.every(app.validateRequest)) {
                 app.getImageAssets();
+                app.getFooterAd();
+                app.getSecondAd();
+                app.getThirdAd();
                 app.dbChangeVersion(0, localStorage.getItem('dbLocalVersion'), localStorage.getItem('dbCurrentOnline'));
                 if(app.getBoolean(localStorage.getItem("isUserLoggedIn")) != true) {
                     app.displayPage("login.html");
@@ -257,6 +346,39 @@ var app = {
                 app.imgDb.transaction(function (tx) {
                     tx.executeSql("UPDATE profile_pic SET timestamp = "+timestamp+" WHERE filename = '"+filename+"'", []);
                 });
+            },
+            app.fileSystemError
+        );
+    },
+    fetchFooterAd: function(url, filename, timestamp, call, link) {
+        var localFileURL = app.imgDir.toURL() + filename;
+        var ft = new FileTransfer();
+        ft.download(url, localFileURL,
+            function(entry) {
+                var footerAdImg = {url:filename, timestamp:timestamp, call: call, link: link};
+                localStorage.setItem("footerAdImg",JSON.stringify(footerAdImg));
+            },
+            app.fileSystemError
+        );
+    },
+    fetchSecondAd: function(url, filename, timestamp) {
+        var localFileURL = app.imgDir.toURL() + filename;
+        var ft = new FileTransfer();
+        ft.download(url, localFileURL,
+            function(entry) {
+                var secondAdImg = {url:filename, timestamp:timestamp};
+                localStorage.setItem("secondAdImg",JSON.stringify(secondAdImg));
+            },
+            app.fileSystemError
+        );
+    },
+    fetchThirdAd: function(url, filename, timestamp) {
+        var localFileURL = app.imgDir.toURL() + filename;
+        var ft = new FileTransfer();
+        ft.download(url, localFileURL,
+            function(entry) {
+                var thirdAdImg = {url:filename, timestamp:timestamp};
+                localStorage.setItem("thirdAdImg",JSON.stringify(thirdAdImg));
             },
             app.fileSystemError
         );
