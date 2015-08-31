@@ -5,6 +5,8 @@ var app = {
     backURL: "",
     db: {},
     imgDb: {},
+    secondAdTimeout: null,
+    thirdAdTimeout: null,
     getAppDb: function() {
         if(localStorage.getItem('dbLocalVersion') == null) {
             localStorage.setItem('dbLocalVersion','-1');
@@ -26,15 +28,15 @@ var app = {
         navigator.splashscreen.show();
         if(localStorage.getItem("secondAdImg") != null) {
             var imgDir = localStorage.getItem("imgDir");
-            $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("secondAdImg")).url+"' id='second_splash' />");
-            setTimeout(function () {
+            $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("secondAdImg")).url+"' id='second_splash' onclick='app.showAdPopup(0)'/>");
+            app.secondAdTimeout = setTimeout(function () {
                 navigator.splashscreen.hide();
                 if(localStorage.getItem("thirdAdImg") != null) {
-                    $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("thirdAdImg")).url+"' id='third_splash' />");
+                    $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("thirdAdImg")).url+"' id='third_splash' onclick='app.showAdPopup(1)' />");
                     setTimeout(function () {
                         $('#second_splash').remove();
                     }, 1500);
-                    setTimeout(function () {
+                    app.thirdAdTimeout = setTimeout(function () {
                         $('#third_splash').remove();
                     }, 3500);
                 } else {
@@ -64,6 +66,7 @@ var app = {
         localStorage.setItem("hitFooterAdServer",false);
         localStorage.setItem("hitSecondAdServer",false);
         localStorage.setItem("hitThirdAdServer",false);
+        localStorage.setItem("hitFbPageLinkServer",false);
         app.checkConnection();
     },
     checkConnection: function () {
@@ -106,7 +109,7 @@ var app = {
 
             localStorage.setItem('dbCurrentOnline',json[0][0]);
 
-            app.requestStatus = [false, false, false, false, false, false, false, false, false, false];
+            app.requestStatus = [false, false, false, false, false, false, false, false, false, false, false];
 
             $.getJSON('http://iya.incorelabs.com/users.php', function(userData) {
                 app.createTable(userData,"users",0);
@@ -135,12 +138,16 @@ var app = {
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_secretaries.php', function(pastSecretariesData) {
                 app.createTable(pastSecretariesData,"past_secretaries",8);
             });
+            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_chairmen.php', function(pastChairmenData) {
+                app.createTable(pastChairmenData,"past_chairmen",9);
+            });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_treasurers.php', function(pastTreasurersData) {
-                app.createTable(pastTreasurersData,"past_treasurers",9);
+                app.createTable(pastTreasurersData,"past_treasurers",10);
             });
             
         } else {
             // Internet BUT Data is Up to Date.
+            app.getFbLink();
             app.getImageAssets();
             app.getFooterAd();
             app.getSecondAd();
@@ -152,6 +159,21 @@ var app = {
             }
             $('#loading').toggleClass('hidden');        // Hides the loading screen.
             $('#app').toggleClass('hidden');            // Shows the app div.
+        }
+    },
+    getFbLink: function () {
+        var linkUrl = "http://iya.incorelabs.com/social/fb.php";
+        if(app.getBoolean(localStorage.getItem("hitFbPageLinkServer")) != true){
+            // Once per app server hit.
+            $.getJSON(linkUrl).done(function(res) {
+                if(res.link != null) {
+                    var fbPageLink = {link:res.link};
+                    localStorage.setItem("fbPageLink",JSON.stringify(fbPageLink));
+                } else {
+                    localStorage.removeItem("fbPageLink");
+                }
+                localStorage.setItem("hitFbPageLinkServer",true);
+            });
         }
     },
     getImageAssets: function () {
@@ -204,6 +226,11 @@ var app = {
             if(app.getBoolean(localStorage.getItem("hitFooterAdServer")) != true){
                 // Once per app server hit.
                 $.getJSON(urlImages).done(function(res) {
+                    if(res[0].noAd == true) {
+                        localStorage.removeItem("footerAdImg");
+                        localStorage.setItem("hitFooterAdServer",true);
+                        return;
+                    }
                     if(localStorage.getItem("footerAdImg") == null) {
                         app.fetchFooterAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
                     } else {
@@ -227,11 +254,19 @@ var app = {
             if(app.getBoolean(localStorage.getItem("hitSecondAdServer")) != true){
                 // Once per app server hit.
                 $.getJSON(urlImages).done(function(res) {
+                    if(res[0].noAd == true) {
+                        localStorage.removeItem("secondAdImg");
+                        localStorage.setItem("hitSecondAdServer",true);
+                        return;
+                    }
                     if(localStorage.getItem("secondAdImg") == null) {
-                        app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                        app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
                     } else {
                         if(JSON.parse(localStorage.getItem("secondAdImg")).timestamp != res[0].timestamp) {
-                            app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                            app.fetchSecondAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
+                        } else {
+                            var secondAdImg = {url:res[0].url.split("/").pop(), timestamp:res[0].timestamp.toString(), call:res[0].call, link:res[0].link};
+                            localStorage.setItem("secondAdImg",JSON.stringify(secondAdImg));
                         }
                     }
                     localStorage.setItem("hitSecondAdServer",true);
@@ -247,11 +282,19 @@ var app = {
             if(app.getBoolean(localStorage.getItem("hitThirdAdServer")) != true){
                 // Once per app server hit.
                 $.getJSON(urlImages).done(function(res) {
+                    if(res[0].noAd == true) {
+                        localStorage.removeItem("thirdAdImg");
+                        localStorage.setItem("hitThirdAdServer",true);
+                        return;
+                    }
                     if(localStorage.getItem("thirdAdImg") == null) {
-                        app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                        app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
                     } else {
                         if(JSON.parse(localStorage.getItem("thirdAdImg")).timestamp != res[0].timestamp) {
-                            app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString());
+                            app.fetchThirdAd(res[0].url, res[0].url.split("/").pop(), res[0].timestamp.toString(), res[0].call, res[0].link);
+                        }  else {
+                            var thirdAdImg = {url:res[0].url.split("/").pop(), timestamp:res[0].timestamp.toString(), call:res[0].call, link:res[0].link};
+                            localStorage.setItem("thirdAdImg",JSON.stringify(thirdAdImg));
                         }
                     }
                     localStorage.setItem("hitThirdAdServer",true);
@@ -301,6 +344,7 @@ var app = {
             }
             app.requestStatus[index] = true;
             if(app.requestStatus.every(app.validateRequest)) {
+                app.getFbLink();
                 app.getImageAssets();
                 app.getFooterAd();
                 app.getSecondAd();
@@ -361,23 +405,23 @@ var app = {
             app.fileSystemError
         );
     },
-    fetchSecondAd: function(url, filename, timestamp) {
+    fetchSecondAd: function(url, filename, timestamp, call, link) {
         var localFileURL = app.imgDir.toURL() + filename;
         var ft = new FileTransfer();
         ft.download(url, localFileURL,
             function(entry) {
-                var secondAdImg = {url:filename, timestamp:timestamp};
+                var secondAdImg = {url:filename, timestamp:timestamp, call: call, link: link};
                 localStorage.setItem("secondAdImg",JSON.stringify(secondAdImg));
             },
             app.fileSystemError
         );
     },
-    fetchThirdAd: function(url, filename, timestamp) {
+    fetchThirdAd: function(url, filename, timestamp, call, link) {
         var localFileURL = app.imgDir.toURL() + filename;
         var ft = new FileTransfer();
         ft.download(url, localFileURL,
             function(entry) {
-                var thirdAdImg = {url:filename, timestamp:timestamp};
+                var thirdAdImg = {url:filename, timestamp:timestamp, call: call, link: link};
                 localStorage.setItem("thirdAdImg",JSON.stringify(thirdAdImg));
             },
             app.fileSystemError
@@ -497,6 +541,129 @@ var app = {
         } else {
             navigator.notification.confirm("You don't have a working internet connection.", app.onOfflineConfirm, 'Offline', ['Try Again','Exit']);
         }
+    },
+    showAdPopup: function(adId) {
+        var adImg = app.getAdObject(adId);
+        if(adImg.call != null && adImg.link != null) {
+            app.stopTimers(adId);
+            navigator.notification.confirm("You could do any of the following.", app.onBothNotNullConfirm, "What Next?", ['Call', 'Website', 'Cancel']);
+        } else if(adImg.call != null) {
+            app.stopTimers(adId);
+            navigator.notification.confirm("You could do any of the following.", app.onCallNotNullConfirm, "What Next?", ['Call', 'Cancel']);
+        } else if(adImg.link != null) {
+            app.stopTimers(adId);
+            navigator.notification.confirm("You could do any of the following.", app.onLinkNotNullConfirm, "What Next?", ['Website', 'Cancel']);
+        }
+    },
+    getAdObject: function (adId) {
+        switch (adId) {
+            case 0:
+                return JSON.parse(localStorage.getItem("secondAdImg"));
+            case 1:
+                return JSON.parse(localStorage.getItem("thirdAdImg"));
+        }
+    },
+    getAdName: function () {
+        switch (localStorage.getItem('adId')) {
+            case '0':
+                return "secondAdImg";
+            case '1':
+                return "thirdAdImg";
+        }
+    },
+    stopTimers: function (adId) {
+        localStorage.setItem('adId', adId);
+        switch (adId) {
+            case 0:
+                clearTimeout(app.secondAdTimeout);
+                break;
+            case 1:
+                clearTimeout(app.thirdAdTimeout);
+                $('#second_splash').remove();
+                break;
+        }
+    },
+    onBothNotNullConfirm: function(buttonIndex) {
+        if (buttonIndex == 1) {
+            window.location = "tel:"+JSON.parse(localStorage.getItem(app.getAdName())).call;
+        } else if (buttonIndex == 2) {
+            window.open(JSON.parse(localStorage.getItem(app.getAdName())).link, "_system");
+        }
+        app.resumeAd();
+    },
+    onCallNotNullConfirm: function(buttonIndex) {
+        if (buttonIndex == 1) {
+            window.location = "tel:"+JSON.parse(localStorage.getItem(app.getAdName())).call;
+        }
+        app.resumeAd();
+    },
+    onLinkNotNullConfirm: function(buttonIndex) {
+        if (buttonIndex == 1) {
+            window.open(JSON.parse(localStorage.getItem(app.getAdName())).link, "_system");
+        }
+        app.resumeAd();
+    },
+    resumeAd: function() {
+        var adId = localStorage.getItem('adId');
+        if(adId == 0) {
+            if(localStorage.getItem("thirdAdImg") != null) {
+                var imgDir = localStorage.getItem("imgDir");
+                $("body").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("thirdAdImg")).url+"' id='third_splash' onclick='app.showAdPopup(1)' />");
+                setTimeout(function () {
+                    $('#second_splash').remove();
+                }, 1500);
+                app.thirdAdTimeout = setTimeout(function () {
+                    $('#third_splash').remove();
+                }, 3500);
+            } else {
+                $('#second_splash').remove();
+            }
+        } else if (adId == 1) {
+            $('#third_splash').remove();
+        }
+    },
+    getMonth: function (month) {
+        var monthName = null;
+        month = parseInt(month);
+        switch (month) {
+            case 1:
+                monthName = "January";
+                break;
+            case 2:
+                monthName = "February";
+                break;
+            case 3:
+                monthName = "March";
+                break;
+            case 4:
+                monthName = "April";
+                break;
+            case 5:
+                monthName = "May";
+                break;
+            case 6:
+                monthName = "June";
+                break;
+            case 7:
+                monthName = "July";
+                break;
+            case 8:
+                monthName = "August";
+                break;
+            case 9:
+                monthName = "September";
+                break;
+            case 10:
+                monthName = "October";
+                break;
+            case 11:
+                monthName = "November";
+                break;
+            case 12:
+                monthName = "December";
+                break;
+        }
+        return monthName;
     }
 };
 

@@ -95,12 +95,20 @@ a:hover {
     padding: 0;
 }
 
-#bckWithSearch {
-    margin: 8px 0 0em 0.6667em;
+#bckWithSearch, #fbBtn {
     display: inline-block;
     float: left;
+}
+
+#bckWithSearch {
+    margin: 8px 0 0em 0.6667em;
     background-color: white;
     padding-bottom: 5px;
+}
+
+#fbBtn {
+    margin: 0.8em 0 0em 0.6667em;
+    border-radius: 0.5em;
 }
 
 #bckWithoutSearch {

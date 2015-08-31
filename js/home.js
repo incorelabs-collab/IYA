@@ -205,5 +205,8 @@ $(document).ready(function() {
         var imgDir = localStorage.getItem("imgDir");
         $("#footerAdBlock").append("<img src='"+imgDir+JSON.parse(localStorage.getItem("footerAdImg")).url+"' class='img-responsive' />");
     }
+    if(localStorage.getItem("fbPageLink") != null) {
+        $("#fbBtn").attr("onclick","window.open('"+JSON.parse(localStorage.getItem("fbPageLink")).link+"', '_system')");
+    }
     pageHome.initPush();
 });
