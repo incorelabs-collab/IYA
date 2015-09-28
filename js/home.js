@@ -1,86 +1,5 @@
 var pageHome = {
-    pushNotification: window.plugins.pushNotification,
-    initPush: function() {
-        if (device.platform == 'android' || device.platform == 'Android') {
-            pageHome.pushNotification.register(pageHome.successHandler, pageHome.errorHandler, {
-                "senderID" : "941377304309",
-                "ecb" : "pageHome.onNotificationGCM"
-            });
-        } else {
-            pageHome.pushNotification.register(pageHome.tokenHandlerAPN, pageHome.errorHandler, {
-                "badge" : "true",
-                "sound" : "true",
-                "alert" : "true",
-                "ecb" : "pageHome.onNotificationAPN"
-            });
-        }
-    },
-    tokenHandlerAPN: function(token) {
-        var pushToken = localStorage.getItem("pushToken");
-        if(pushToken == null || pushToken != token) {
-            $.ajax({
-                url: 'http://iya.incorelabs.com/notification/register.php',
-                type: 'POST',
-                dataType: 'json',
-                data: {uid : localStorage.getItem("login_user_id"), regId : token, deviceType : '1'},
-                success: function(data) {
-                    localStorage.setItem("pushToken", token);
-                    // TODO : Add functionality to check if the registration was successful for Apple iOS.
-                },
-                error: function(error) {
-                }
-            });
-        }
-    },
-    onNotificationAPN: function(e) {
-        if (e.alert) {
-            navigator.notification.alert(e.alert, app.alertDismissed, e.acme, 'Dismiss');
-        }
-        if (e.badge) {
-            pageHome.pushNotification.setApplicationIconBadgeNumber(pageHome.successHandler, e.badge);
-        }
-    },
-    onNotificationGCM: function(e) {
-        switch(e.event) {
-            case 'registered':
-                if (e.regid.length > 0) {
-                    var pushToken = localStorage.getItem("pushToken");
-                    if(pushToken == null || pushToken != e.regid) {
-                        // If the device has NOT registered or the device id has changed then only register again.
-                        $.ajax({
-                            url: 'http://iya.incorelabs.com/notification/register.php',
-                            type: 'POST',
-                            dataType: 'json',
-                            data: {uid : localStorage.getItem("login_user_id"), regId : e.regid, deviceType : '0'},
-                            success: function(data) {
-                                localStorage.setItem("pushToken", e.regid);
-                                // TODO : Add functionality to check if the registration was successful for Google Android.
-                            },
-                            error: function(error) {
-                            }
-                        });
-                    }
-                }
-                break;
-
-            case 'message':
-                navigator.notification.alert(e.payload.message, app.alertDismissed, e.payload.title, 'Dismiss');
-                break;
-
-            case 'error':
-                navigator.notification.alert(e.msg, app.alertDismissed, "Error", "Dismiss");
-                break;
-
-            default:
-                navigator.notification.alert("An error has occurred with our Server. Sorry for the inconvenience.", app.alertDismissed, "Connection Error", "Dismiss");
-                break;
-        }
-    },
-    successHandler: function(result) {
-    },
-    errorHandler: function(error) {
-        navigator.notification.alert("An ERROR has occurred while setting up PUSH notifications.", app.alertDismissed, "PUSH Notification Error", "Dismiss");
-    },
+    push: PushNotification.init({"android": {"senderID": "941377304309", "icon":"push","iconColor":"grey"}, "ios": {"alert": "true", "badge": "true", "sound": "true"}}),
     changePage: function(url) {
         app.setBackPage("home.html");
         app.displayPage(url);
@@ -208,5 +127,41 @@ $(document).ready(function() {
     if(localStorage.getItem("fbPageLink") != null) {
         $("#fbBtn").attr("onclick","window.open('"+JSON.parse(localStorage.getItem("fbPageLink")).link+"', '_system')");
     }
-    pageHome.initPush();
+
+    pageHome.push.on('registration', function(data) {
+        console.log(data);
+        var deviceType = null;
+        if (device.platform == 'android' || device.platform == 'Android')
+            deviceType = 0;
+        else
+            deviceType = 1;
+
+        var pushToken = localStorage.getItem("pushToken");
+        if(pushToken == null || pushToken != data.registrationId) {
+            $.ajax({
+                url: 'http://iya.incorelabs.com/notification/register.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {uid : localStorage.getItem("login_user_id"), regId : data.registrationId, deviceType : deviceType},
+                success: function(response) {
+                    console.log(response);
+                    localStorage.setItem("pushToken", data.registrationId);
+                },
+                error: function(error) {
+                }
+            });
+        }
+    });
+
+    pageHome.push.on('notification', function(data) {
+        console.log(data);
+        navigator.notification.alert(data.message, app.alertDismissed, data.title, 'Dismiss');
+        if(data.additionalData.location)
+            pageHome.changePage(data.additionalData.location);
+    });
+
+    pageHome.push.on('error', function(e) {
+        console.log(e);
+        navigator.notification.alert("An ERROR has occurred while setting up PUSH notifications.", app.alertDismissed, "PUSH Notification Error", "Dismiss");
+    });
 });

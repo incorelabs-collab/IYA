@@ -109,7 +109,7 @@ var app = {
 
             localStorage.setItem('dbCurrentOnline',json[0][0]);
 
-            app.requestStatus = [false, false, false, false, false, false, false, false, false, false, false];
+            app.requestStatus = [false, false, false, false, false, false, false, false, false, false, false, false];
 
             $.getJSON('http://iya.incorelabs.com/users.php', function(userData) {
                 app.createTable(userData,"users",0);
@@ -132,17 +132,20 @@ var app = {
             $.getJSON('http://iya.incorelabs.com/events.php', function(eventsData) {
                 app.createTable(eventsData,"events",6);
             });
+            $.getJSON('http://iya.incorelabs.com/pastLeaders/founders.php', function(pastFoundersData) {
+                app.createTable(pastFoundersData,"founders",7);
+            });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_presidents.php', function(pastPresidentsData) {
-                app.createTable(pastPresidentsData,"past_presidents",7);
+                app.createTable(pastPresidentsData,"past_presidents",8);
             });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_secretaries.php', function(pastSecretariesData) {
-                app.createTable(pastSecretariesData,"past_secretaries",8);
+                app.createTable(pastSecretariesData,"past_secretaries",9);
             });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_chairmen.php', function(pastChairmenData) {
-                app.createTable(pastChairmenData,"past_chairmen",9);
+                app.createTable(pastChairmenData,"past_chairmen",10);
             });
             $.getJSON('http://iya.incorelabs.com/pastLeaders/past_treasurers.php', function(pastTreasurersData) {
-                app.createTable(pastTreasurersData,"past_treasurers",10);
+                app.createTable(pastTreasurersData,"past_treasurers",11);
             });
             
         } else {

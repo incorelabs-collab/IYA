@@ -44,6 +44,7 @@ $(document).ready(function() {
                     eventConcatString += "<div class='panel-group' id='"+anEventString+"'>";
                     for(var i =0;i< r.rows.length; i++) {
                         eventConcatString += "<div class='panel panel-default'><div class='panel-heading'><h4 class='panel-title'>";
+                        var flag = false;
                         $.each(r.rows.item(i), function(index, val) {
                             if(val != null) {
                                 switch(index) {
@@ -62,6 +63,7 @@ $(document).ready(function() {
                                         eventConcatString += "<div class='panel panel-info'><div class='panel-heading'><h4 class='panel-title'>";
                                         eventConcatString += "<a data-toggle='collapse' data-parent='#"+eventDataConcatString+i+"' href='#"+collapseString+j+"' class='eventBdayFont'>Time</a></h4></div>";
                                         eventConcatString += "<div id='"+collapseString+j+"' class='panel-collapse collapse'><div class='panel-body'>"+val;
+                                        flag = true;
                                         break;
                                     case "Time":
                                         eventConcatString += " At "+val+"</div></div></div>";
@@ -80,6 +82,9 @@ $(document).ready(function() {
                                         j++;
                                         break;
                                 }
+                            } else if (index == "Time") {
+                                eventConcatString += "</div></div></div>";
+                                j++;
                             }
                         });
                         eventConcatString += "</div></div></div>";
