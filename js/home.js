@@ -129,7 +129,6 @@ $(document).ready(function() {
     }
 
     pageHome.push.on('registration', function(data) {
-        console.log(data);
         var deviceType = null;
         if (device.platform == 'android' || device.platform == 'Android')
             deviceType = 0;
@@ -144,7 +143,6 @@ $(document).ready(function() {
                 dataType: 'json',
                 data: {uid : localStorage.getItem("login_user_id"), regId : data.registrationId, deviceType : deviceType},
                 success: function(response) {
-                    console.log(response);
                     localStorage.setItem("pushToken", data.registrationId);
                 },
                 error: function(error) {
@@ -154,7 +152,6 @@ $(document).ready(function() {
     });
 
     pageHome.push.on('notification', function(data) {
-        console.log(data);
         if (device.platform == 'android' || device.platform == 'Android') {
             navigator.notification.alert(data.message, app.alertDismissed, data.title, 'Dismiss');
         } else {
@@ -165,7 +162,6 @@ $(document).ready(function() {
     });
 
     pageHome.push.on('error', function(e) {
-        console.log(e);
         navigator.notification.alert("An ERROR has occurred while setting up PUSH notifications.", app.alertDismissed, "PUSH Notification Error", "Dismiss");
     });
 });
