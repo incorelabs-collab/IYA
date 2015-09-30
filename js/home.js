@@ -155,7 +155,11 @@ $(document).ready(function() {
 
     pageHome.push.on('notification', function(data) {
         console.log(data);
-        navigator.notification.alert(data.message, app.alertDismissed, data.title, 'Dismiss');
+        if (device.platform == 'android' || device.platform == 'Android') {
+            navigator.notification.alert(data.message, app.alertDismissed, data.title, 'Dismiss');
+        } else {
+            navigator.notification.alert(data.message, app.alertDismissed, data.additionalData.title, 'Dismiss');
+        }
         if(data.additionalData.location)
             pageHome.changePage(data.additionalData.location);
     });
