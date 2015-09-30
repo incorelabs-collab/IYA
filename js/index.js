@@ -77,7 +77,7 @@ var app = {
         }
     },
     doOnlineTasks: function() {
-        var urlData = 'http://iya.incorelabs.com/db_version.php';
+        var urlData = 'http://128.199.157.166/iya/db_version.php';
         if(localStorage.getItem('dbLocalVersion') == -1) {
             $.getJSON(urlData).done(app.checkWithLocalDB);
         } else {
@@ -111,40 +111,40 @@ var app = {
 
             app.requestStatus = [false, false, false, false, false, false, false, false, false, false, false, false];
 
-            $.getJSON('http://iya.incorelabs.com/users.php', function(userData) {
+            $.getJSON('http://128.199.157.166/iya/users.php', function(userData) {
                 app.createTable(userData,"users",0);
             });
-            $.getJSON('http://iya.incorelabs.com/male.php', function(maleData) {
+            $.getJSON('http://128.199.157.166/iya/male.php', function(maleData) {
                 app.createTable(maleData,"male",1);
             });
-            $.getJSON('http://iya.incorelabs.com/female.php', function(femaleData) {
+            $.getJSON('http://128.199.157.166/iya/female.php', function(femaleData) {
                 app.createTable(femaleData,"female",2);
             });
-            $.getJSON('http://iya.incorelabs.com/common.php', function(commonData) {
+            $.getJSON('http://128.199.157.166/iya/common.php', function(commonData) {
                 app.createTable(commonData,"common",3);
             });
-            $.getJSON('http://iya.incorelabs.com/kids.php', function(kidsData) {
+            $.getJSON('http://128.199.157.166/iya/kids.php', function(kidsData) {
                 app.createTable(kidsData,"kids",4);
             });
-            $.getJSON('http://iya.incorelabs.com/directors.php', function(directorsData) {
+            $.getJSON('http://128.199.157.166/iya/directors.php', function(directorsData) {
                 app.createTable(directorsData,"directors",5);
             });
-            $.getJSON('http://iya.incorelabs.com/events.php', function(eventsData) {
+            $.getJSON('http://128.199.157.166/iya/events.php', function(eventsData) {
                 app.createTable(eventsData,"events",6);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/founders.php', function(pastFoundersData) {
+            $.getJSON('http://128.199.157.166/iya/pastLeaders/founders.php', function(pastFoundersData) {
                 app.createTable(pastFoundersData,"founders",7);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_presidents.php', function(pastPresidentsData) {
+            $.getJSON('http://128.199.157.166/iya/pastLeaders/past_presidents.php', function(pastPresidentsData) {
                 app.createTable(pastPresidentsData,"past_presidents",8);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_secretaries.php', function(pastSecretariesData) {
+            $.getJSON('http://128.199.157.166/iya/pastLeaders/past_secretaries.php', function(pastSecretariesData) {
                 app.createTable(pastSecretariesData,"past_secretaries",9);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_chairmen.php', function(pastChairmenData) {
+            $.getJSON('http://128.199.157.166/iya/pastLeaders/past_chairmen.php', function(pastChairmenData) {
                 app.createTable(pastChairmenData,"past_chairmen",10);
             });
-            $.getJSON('http://iya.incorelabs.com/pastLeaders/past_treasurers.php', function(pastTreasurersData) {
+            $.getJSON('http://128.199.157.166/iya/pastLeaders/past_treasurers.php', function(pastTreasurersData) {
                 app.createTable(pastTreasurersData,"past_treasurers",11);
             });
             
@@ -165,7 +165,7 @@ var app = {
         }
     },
     getFbLink: function () {
-        var linkUrl = "http://iya.incorelabs.com/social/fb.php";
+        var linkUrl = "http://128.199.157.166/iya/social/fb.php";
         if(app.getBoolean(localStorage.getItem("hitFbPageLinkServer")) != true){
             // Once per app server hit.
             $.getJSON(linkUrl).done(function(res) {
@@ -180,7 +180,7 @@ var app = {
         }
     },
     getImageAssets: function () {
-        var urlImages = 'http://iya.incorelabs.com/images/file-list.php?key=kamlesh';
+        var urlImages = 'http://128.199.157.166/iya/images/file-list.php?key=kamlesh';
         var dirReference = app.getDirectoryReference();
         dirReference.done(function(imgDir) {
             app.imgDir = imgDir;
@@ -222,7 +222,7 @@ var app = {
         });
     },
     getFooterAd: function() {
-        var urlImages = 'http://iya.incorelabs.com/ads/file-list.php?key=kamlesh';
+        var urlImages = 'http://128.199.157.166/iya/ads/file-list.php?key=kamlesh';
         var dirReference = app.getDirectoryReference();
         dirReference.done(function(imgDir) {
             app.imgDir = imgDir;
@@ -250,7 +250,7 @@ var app = {
         });
     },
     getSecondAd: function() {
-        var urlImages = 'http://iya.incorelabs.com/adTwo/file-list.php?key=kamlesh';
+        var urlImages = 'http://128.199.157.166/iya/adTwo/file-list.php?key=kamlesh';
         var dirReference = app.getDirectoryReference();
         dirReference.done(function(imgDir) {
             app.imgDir = imgDir;
@@ -278,7 +278,7 @@ var app = {
         });
     },
     getThirdAd: function() {
-        var urlImages = 'http://iya.incorelabs.com/adThree/file-list.php?key=kamlesh';
+        var urlImages = 'http://128.199.157.166/iya/adThree/file-list.php?key=kamlesh';
         var dirReference = app.getDirectoryReference();
         dirReference.done(function(imgDir) {
             app.imgDir = imgDir;

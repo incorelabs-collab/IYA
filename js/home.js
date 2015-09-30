@@ -7,9 +7,9 @@ var pageHome = {
     launchAlbumsPage: function() {
         if(app.isConnectionAvailable()) {
             if (device.platform == 'android' || device.platform == 'Android') {
-                pageHome.gallery_ref = window.open("http://iya.incorelabs.com/gallery/index.php", "_blank","location=no,hidden=yes,zoom=no");
+                pageHome.gallery_ref = window.open("http://128.199.157.166/iya/gallery/index.php", "_blank","location=no,hidden=yes,zoom=no");
             } else {
-                pageHome.gallery_ref = window.open("http://iya.incorelabs.com/gallery/index.php", "_blank","location=no,closebuttoncaption=Close,hidden=yes");
+                pageHome.gallery_ref = window.open("http://128.199.157.166/iya/gallery/index.php", "_blank","location=no,closebuttoncaption=Close,hidden=yes");
             }
             pageHome.gallery_ref.addEventListener('loadstart', pageHome.galleryLoadStart);
             pageHome.gallery_ref.addEventListener('loaderror', pageHome.galleryLoadError);
@@ -139,7 +139,7 @@ $(document).ready(function() {
         var pushToken = localStorage.getItem("pushToken");
         if(pushToken == null || pushToken != data.registrationId) {
             $.ajax({
-                url: 'http://iya.incorelabs.com/notification/register.php',
+                url: 'http://128.199.157.166/iya/notification/register.php',
                 type: 'POST',
                 dataType: 'json',
                 data: {uid : localStorage.getItem("login_user_id"), regId : data.registrationId, deviceType : deviceType},

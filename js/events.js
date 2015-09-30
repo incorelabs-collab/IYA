@@ -122,7 +122,7 @@ $('form').on('submit', function(e){
         } else {
             ProgressIndicator.showSimpleWithLabel(true, "Syncing with Server...");
         }
-        $.post("http://iya.incorelabs.com/rsvp.php", JSON.parse(jsonObj), function(data, textStatus, xhr) {
+        $.post("http://128.199.157.166/iya/rsvp.php", JSON.parse(jsonObj), function(data, textStatus, xhr) {
             if (device.platform == 'android' || device.platform == 'Android') {
                 window.plugins.spinnerDialog.hide();
             } else {
